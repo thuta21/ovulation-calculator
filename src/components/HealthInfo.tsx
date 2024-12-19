@@ -16,7 +16,6 @@ interface HealthInfoProps {
 
 const HealthInfo: React.FC<HealthInfoProps> = ({ title, items }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
-  const { language } = useLanguage()
 
   const toggleItem = (index: number) => {
     setOpenIndex(openIndex === index ? null : index)

@@ -31,7 +31,6 @@ export function calculateNextPeriods(
 export function isPeriodDay(
   date: Date,
   predictions: PeriodPrediction[],
-  periodLength: number
 ): boolean {
   const normalizedDate = startOfDay(date);
   return predictions.some((prediction) =>

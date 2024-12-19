@@ -7,7 +7,7 @@ import Facts from '@/components/Facts'
 import HealthInfoSection from '@/components/HealthInfo'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/CustomComponents'
-// import './global.css'
+import './globals.css'
 
 interface CycleData {
   periodDates: Date[]
