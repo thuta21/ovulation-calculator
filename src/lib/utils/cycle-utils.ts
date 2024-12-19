@@ -1,5 +1,5 @@
 import { differenceInDays, startOfDay } from "date-fns";
-import { CyclePhase } from "../types/period";
+import { CyclePhase } from '@/lib/cycle-utils';
 
 export function getCurrentPhase(lastPeriod: Date, cycleLength: number = 28): CyclePhase | null {
   const today = startOfDay(new Date());
@@ -26,10 +26,10 @@ export function getPhaseForDayNumber(dayInCycle: number): CyclePhase | null {
   return phases.find(phase => dayInCycle >= phase.startDay && dayInCycle <= phase.endDay) || null;
 }
 
-export function getDayMessage(date: Date, lastPeriod: Date, language: 'en' | 'my'): string {
+export function getDayMessage(date: Date, lastPeriod: Date, language: 'en' | 'my'): string | null {
   const cycleDay = differenceInDays(startOfDay(date), startOfDay(lastPeriod)) % 28 + 1;
-  
-  const messages = {
+
+  const messages: { [key: string]: { [key: number]: string } } = {
     en: {
       1: "First day of your period. Take it easy and stay hydrated! 💜",
       2: "Day 2 - Flow might be heavier. Remember to rest! 💪",
