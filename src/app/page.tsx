@@ -1,101 +1,113 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { useState } from 'react'
+import Calendar from '@/components/Calendar'
+import CalculatorForm from '@/components/CalculatorForm'
+import Facts from '@/components/Facts'
+import HealthInfoSection from '@/components/HealthInfo'
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
+import { Button } from '@/components/CustomComponents'
+// import './global.css'
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+interface CycleData {
+  periodDates: Date[]
+  ovulationDate: Date
+  fertileDates: Date[]
 }
+
+function LanguageToggle() {
+  const { language, toggleLanguage } = useLanguage()
+  return (
+    <Button onClick={toggleLanguage} className="mb-4">
+      {language === 'en' ? 'မြန်မာ' : 'English'}
+    </Button>
+  )
+}
+
+function OvulationCalculatorContent() {
+  const [cycleLength, setCycleLength] = useState(28)
+  const [lastPeriodDate, setLastPeriodDate] = useState<Date | null>(null)
+  const [periodDuration, setPeriodDuration] = useState(5)
+  const [calculatedDates, setCalculatedDates] = useState<CycleData[] | null>(null)
+  const { language } = useLanguage()
+
+  const calculateDates = (lastPeriod: Date, cycleLen: number, periodDur: number) => {
+    const cycles: CycleData[] = []
+    let currentCycleStart = new Date(lastPeriod)
+
+    for (let i = 0; i < 3; i++) {
+      const periodDates: Date[] = []
+      const fertileDates: Date[] = []
+      const ovulationDate = new Date(currentCycleStart.getTime() + (cycleLen - 14) * 24 * 60 * 60 * 1000)
+
+      for (let j = 0; j < periodDur; j++) {
+        periodDates.push(new Date(currentCycleStart.getTime() + j * 24 * 60 * 60 * 1000))
+      }
+
+      for (let j = -5; j <= 1; j++) {
+        fertileDates.push(new Date(ovulationDate.getTime() + j * 24 * 60 * 60 * 1000))
+      }
+
+      cycles.push({ periodDates, ovulationDate, fertileDates })
+      currentCycleStart = new Date(currentCycleStart.getTime() + cycleLen * 24 * 60 * 60 * 1000)
+    }
+
+    setCalculatedDates(cycles)
+  }
+
+  return (
+    <div className="min-h-screen p-8">
+      <h1 className="text-4xl font-bold text-center mb-8 text-purple-800">
+        {language === 'en' ? 'Ovulation Calculator' : 'သန္ဓေတည်ချိန် တွက်ချက်ရန်'}
+      </h1>
+      <div className="flex justify-center mb-4">
+        <LanguageToggle />
+      </div>
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <CalculatorForm
+              cycleLength={cycleLength}
+              setCycleLength={setCycleLength}
+              lastPeriodDate={lastPeriodDate}
+              setLastPeriodDate={setLastPeriodDate}
+              periodDuration={periodDuration}
+              setPeriodDuration={setPeriodDuration}
+              onCalculate={() => {
+                if (lastPeriodDate) {
+                  calculateDates(lastPeriodDate, cycleLength, periodDuration)
+                }
+              }}
+            />
+            <Facts />
+          </div>
+          <div className="lg:col-span-2">
+            {calculatedDates ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {calculatedDates.map((cycleData, index) => (
+                  <Calendar key={index} calculatedDates={cycleData} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500">
+                {language === 'en'
+                  ? 'Enter your cycle information and click Calculate to see predictions for the next 3 months.'
+                  : 'သင့်ရာသီစက်ဝန်း အချက်အလက်များကို ဖြည့်သွင်းပြီး နောက်လာမည့် ၃ လအတွက် ခန့်မှန်းချက်များကို ကြည့်ရှုရန် တွက်ချက်မည် ခလုတ်ကို နှိပ်ပါ။'}
+              </div>
+            )}
+          </div>
+        </div>
+        <HealthInfoSection />
+      </div>
+    </div>
+  )
+}
+
+export default function OvulationCalculator() {
+  return (
+    <LanguageProvider>
+      <OvulationCalculatorContent />
+    </LanguageProvider>
+  )
+}
+
